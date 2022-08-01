@@ -15,6 +15,6 @@ func GetConnection() *sql.DB{
 	db.SetMaxOpenConns(100)
 	db.SetConnMaxIdleTime(5 * time.Minute)
 	db.SetConnMaxLifetime(60 * time.Minute)
-
+	
 	return db
 }

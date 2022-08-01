@@ -87,3 +87,33 @@ func TestQuerySqlComplex(t *testing.T){
 	}
 
 }
+
+func TestSqlInjection(t *testing.T){
+	db := GetConnection()
+	defer db.Close()
+
+	ctx := context.Background()
+
+	username := "admin'; #"
+	password := "salah"
+
+	sql := "SELECT username FROM user WHERE username ='"+ username +"' AND password = '"+ password +"' LIMIT 1"
+	rows,err := db.QueryContext(ctx, sql)
+	if err != nil {
+		panic(err)
+	}
+
+	defer rows.Close()
+
+	if rows.Next(){
+		var username string
+		err := rows.Scan(&username)
+		if err != nil {
+			panic(err)
+		}
+			fmt.Println("Login Berhasil")
+	}else {
+		fmt.Println("Login Gagal")
+	}
+
+}
