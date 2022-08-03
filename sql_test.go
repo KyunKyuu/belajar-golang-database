@@ -3,6 +3,7 @@ package belajar_golang_database
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -170,4 +171,41 @@ func TestAutoIncrement(t *testing.T){
 	}
 
 	fmt.Println("Last ID nya adalah", lastId)
+}
+
+
+//Prepare Statement untuk aksi yang berkali kali cuma beda isi paramater nya, kalau pake Exec si statement nya di buat terus tiap ngejalanin exec
+
+func TestPrepareStatement(t *testing.T){
+	db := GetConnection()
+	defer db.Close()
+
+	ctx := context.Background()
+	sql := "INSERT INTO comments(email,comment) VALUES(?,?)"
+
+	statement, err := db.PrepareContext(ctx, sql)
+	if err != nil {
+		panic(err)
+	} 
+	defer statement.Close()
+	
+	for i:=0;i<10;i++{
+		email := "teguh" + strconv.Itoa(i) +"@gmail.com"
+		comment := "komen ke"+ strconv.Itoa(i)
+
+		result, err := statement.ExecContext(ctx, email, comment)
+
+		if err != nil{
+			panic(err)
+		}
+
+		id, err := result.LastInsertId()
+		if err != nil{
+			panic(err)
+		}
+
+		fmt.Println("Komentar ke", id)
+
+	}
+
 }
